@@ -2,6 +2,7 @@ package com.ecommerse.product_service.service;
 
 import com.ecommerse.product_service.dto.ProductRequestDTO;
 import com.ecommerse.product_service.dto.ProductResponseDTO;
+import com.ecommerse.product_service.exception.ResourceNotFoundException;
 import com.ecommerse.product_service.mapper.ProductMapper;
 import com.ecommerse.product_service.model.Product;
 import com.ecommerse.product_service.repository.ProductRepository;
@@ -38,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository
                 .findById(productId)
-                .orElseThrow(() -> new RuntimeException("No se encontro el producto con el id: " + productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Producto", "id", productId));
 
         return productMapper.toProductResponseDTO(product);
     }
@@ -47,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDTO updateProduct(String productId, ProductRequestDTO productRequest) {
         Product product = productRepository
                 .findById(productId)
-                .orElseThrow(() -> new RuntimeException("No se encontro el producto con el id: " + productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Producto", "id", productId));
 
         productMapper.updateProductFromRequest(productRequest, product);
         Product updatedProduct = productRepository.save(product);
