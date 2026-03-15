@@ -7,14 +7,14 @@ import com.ecommerse.product_service.mapper.ProductMapper;
 import com.ecommerse.product_service.model.Product;
 import com.ecommerse.product_service.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -24,6 +24,8 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDTO create(ProductRequestDTO productRequestDTO) {
 
         Product product = productRepository.save(productMapper.toProduct(productRequestDTO));
+
+        log.info("Producto guardado: {}", product.getName());
         return productMapper.toProductResponseDTO(product);
     }
 
@@ -52,6 +54,9 @@ public class ProductServiceImpl implements ProductService {
 
         productMapper.updateProductFromRequest(productRequest, product);
         Product updatedProduct = productRepository.save(product);
+
+        log.info("Producto actualizado: {}", updatedProduct.getName());
+
         return productMapper.toProductResponseDTO(updatedProduct);
     }
 
@@ -59,5 +64,7 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProductById(String productId) {
         if(!productRepository.existsById(productId)) throw new RuntimeException("No existe el producto con el id: " + productId);
         productRepository.deleteById(productId);
+        log.info("Producto con el id: {} fue eliminado", productId);
+
     }
 }
