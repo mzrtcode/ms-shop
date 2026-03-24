@@ -26,7 +26,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional(readOnly = true)
     public boolean isInStock(String sku, Integer quantity) {
         Optional<Inventory> bySku = inventoryRepository.findBySku(sku);
-        return bySku.map(inventory -> inventory.getQuantity() >= 0)
+        return bySku.map(inventory -> inventory.getQuantity() >= quantity)
                 .orElse(false);
     }
 
@@ -78,5 +78,19 @@ public class InventoryServiceImpl implements InventoryService {
 
         inventoryRepository.deleteById(id);
         log.info("Inventario eliminado para el ID:{}", id);
+    }
+
+    @Override
+    @Transactional
+    public void reduceStock(String sku, Integer quantity) {
+        var inventory = inventoryRepository.findBySku(sku)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + sku));
+
+
+        Integer currentQuantity = inventory.getQuantity();
+        if(currentQuantity < quantity) throw new RuntimeException("Stock insuficiente para : " + sku);
+        inventory.setQuantity(currentQuantity - quantity);
+        inventoryRepository.save(inventory);
+
     }
 }
