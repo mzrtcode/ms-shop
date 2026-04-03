@@ -8,6 +8,6 @@ spring:
     config:
       server:
         git:
-          uri: file:///home/mzrt/ms-shop/config-data
+          uri: file:////Users/mzrt/Coding/ms-shop/config-data
           clone-on-start: true
           default-label: main
