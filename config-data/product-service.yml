@@ -1,6 +1,15 @@
 server:
   port: ${SERVER_PORT:8080}
 
+app:
+  maintenance:
+    message: "Sistema Operativo - Version 1.0"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "refresh, health"
+
 spring:
   threads:
     virtual:
