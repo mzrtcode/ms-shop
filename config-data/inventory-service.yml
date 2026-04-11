@@ -26,5 +26,10 @@ management:
       exposure:
         include: "health,refresh"
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
 inventory:
   allow-backorders: true
