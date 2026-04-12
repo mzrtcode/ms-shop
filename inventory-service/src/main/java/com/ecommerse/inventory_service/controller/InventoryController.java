@@ -3,8 +3,8 @@ package com.ecommerse.inventory_service.controller;
 import com.ecommerse.inventory_service.dto.InventoryRequestDTO;
 import com.ecommerse.inventory_service.dto.InventoryResponseDTO;
 import com.ecommerse.inventory_service.service.InventoryService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +38,8 @@ public class InventoryController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<InventoryResponseDTO> getAllInventory(){
+    public List<InventoryResponseDTO> getAllInventory(HttpServletRequest request){
+        IO.println("✅ Peticion atendida desde el puerto: " + request.getServerName());
         return inventoryService.getAllInventory();
     }
 
