@@ -39,7 +39,7 @@ public class InventoryController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<InventoryResponseDTO> getAllInventory(HttpServletRequest request){
-        IO.println("✅ Peticion atendida desde el puerto: " + request.getServerName());
+        IO.println("✅ Peticion atendida desde el puerto: " + request.getLocalPort());
         return inventoryService.getAllInventory();
     }
 

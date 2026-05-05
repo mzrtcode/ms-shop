@@ -5,14 +5,62 @@ spring:
         webflux:
           discovery:
             locator:
-              enabled: true
-              lower-case-service-id: true
+              enabled: true               # Habilita descubrimiento con Eureka
+              lower-case-service-id: true # Normaliza nombres de servicios
+
+      # Filtro global: reenvía el token a los microservicios
+      default-filters:
+        - TokenRelay
+
+      routes:
+        # Productos
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/v1/products/**
+
+        # Órdenes
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/v1/orders/**
+
+        # Inventario
+        - id: inventory-service
+          uri: lb://inventory-service
+          predicates:
+            - Path=/api/v1/inventory/**
+
+  security:
+    oauth2:
+      # Cliente OAuth2 (para TokenRelay)
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/ecommerce_realm
+
+        registration:
+          api-gateway-client:
+            provider: keycloak
+            client-id: api-gateway-client
+            client-secret: TU_SECRET_AQUI  # Reemplazar
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+            scope: openid
+
+      # Valida JWT entrantes
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/ecommerce_realm
+
+
+
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
-    fetch-registry: true
-    register-with-eureka: true
+    fetch-registry: true        # Obtiene servicios
+    register-with-eureka: true # Se registra en Eureka
 
 server:
   port: 9000
