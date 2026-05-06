@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public OrderResponse placeOrder(OrderRequest orderRequest) {
+    public OrderResponse placeOrder(OrderRequest orderRequest, String userId) {
 
         if(!ordersEnabled){
             log.warn("Pedido rechazado: Servicio desabilidado por configuracion");
@@ -44,6 +44,7 @@ public class OrderServiceImpl implements OrderService{
 
         log.info("Colocando nuevo pedido");
         Order order = orderMapper.toOrder(orderRequest);
+
 
         for(var item : order.getOrderLineItemsList()){
             String sku = item.getSku();
@@ -66,6 +67,7 @@ public class OrderServiceImpl implements OrderService{
 
         }
         order.setOrderNumber(UUID.randomUUID().toString());
+        order.setUserId(userId);
 
         Order savedOrder = orderRepository.save(order);
         log.info("Order guradada con exito. ID: {}", savedOrder.getId());
@@ -73,12 +75,17 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<OrderResponse> getAllOrders() {
-        return orderRepository.findAll().stream()
+    public List<OrderResponse> getOrders(String userId, boolean isAdmin) {
+
+        List<Order> orders = isAdmin
+                ? orderRepository.findAll()
+                : orderRepository.findByUserId(userId);
+
+        return orders.stream()
                 .map(orderMapper::toOrderResponse)
                 .toList();
     }
+
 
     @Override
     @Transactional(readOnly = true)

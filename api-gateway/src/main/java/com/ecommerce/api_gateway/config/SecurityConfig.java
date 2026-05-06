@@ -24,7 +24,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity, ReactiveJwtAuthenticationConverter reactiveJwtAuthenticationConverter) {
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
         serverHttpSecurity.csrf(ServerHttpSecurity.CsrfSpec::disable) //Solo se usa con Cookies (Stateful)
                 .authorizeExchange(exchange -> exchange
 
@@ -40,12 +40,15 @@ public class SecurityConfig {
                         // Cualquier usuario con rol USER puede crear órdenes
                         .pathMatchers(HttpMethod.POST,"/api/v1/orders").hasRole(Role.USER.name())
                         // Solo ADMIN puede consultar o gestionar las órdenes
-                        .pathMatchers("/api/v1/orders/**").hasRole(Role.ADMIN.name())
+                        .pathMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .pathMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
 
                         .anyExchange().authenticated()
 
                 )
-                .oauth2ResourceServer( oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(reactiveJwtAuthenticationConverterAdapter()))
+                .oauth2ResourceServer( oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(reactiveJwtAuthenticationConverterAdapter()))
                 );
         return serverHttpSecurity.build();
     }
