@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 0
 
 spring:
   # 🚀 Java 21 Performance
@@ -30,7 +30,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,refresh"
+        include: health,refresh,circuitbreakers,circuitbreakerevents
 
 eureka:
   client:
@@ -39,3 +39,27 @@ eureka:
 
 order:
   enabled: true
+  
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventory:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+  retry:
+    instances:
+      inventory:
+        maxRetryAttempts: 3
+        waitDuration: 2s
+        enableExponentialBackOff: true
+        exponentialBackoffMultiplier: 2
+
+    timelimiter:
+      instances:
+        inventory:
+          timeoutDuration: 3s
+          cancelRunningFuture: true

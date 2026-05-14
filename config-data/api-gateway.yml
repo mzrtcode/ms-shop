@@ -43,7 +43,7 @@ spring:
           api-gateway-client:
             provider: keycloak
             client-id: api-gateway-client
-            client-secret: TU_SECRET_AQUI  # Reemplazar
+            client-secret: TvsQC5IfD4FEH54bVjyDu05CN7txxt03  # Reemplazar
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
             scope: openid

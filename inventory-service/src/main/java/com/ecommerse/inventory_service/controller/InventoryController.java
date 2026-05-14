@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -52,6 +53,13 @@ public class InventoryController {
     @PutMapping("/reduce/{sku}")
     @ResponseStatus(HttpStatus.OK)
     public void reduceStock(@PathVariable String sku, @RequestParam Integer quantity){
+
+        try{
+            IO.println("😴 Durmiendo por 5 seg");
+            Thread.sleep(5000);
+        }catch (InterruptedException e){
+            throw new RuntimeException(e);
+        }
         inventoryService.reduceStock(sku, quantity);
     }
 
