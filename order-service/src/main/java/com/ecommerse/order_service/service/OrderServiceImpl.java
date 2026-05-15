@@ -37,11 +37,9 @@ public class OrderServiceImpl implements OrderService{
 
 
 
-    public CompletableFuture<OrderResponse> fallbackMethod (OrderRequest orderRequest, String userId, Throwable throwable) {
-        return CompletableFuture.supplyAsync(() -> {
+    public OrderResponse fallbackMethod (OrderRequest orderRequest, String userId, Throwable throwable) {
             log.error("🛑 Circuit Breaker activado. Causa: {}", throwable.getMessage());
             throw new RuntimeException("El Servicio de Inventario no responde. Por favor intente mas tarde.");
-        });
     }
 
 
@@ -50,11 +48,7 @@ public class OrderServiceImpl implements OrderService{
     @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
     @Retry(name = "inventory")
     @TimeLimiter(name = "inventory")
-    public CompletableFuture<OrderResponse> placeOrder(OrderRequest orderRequest, String userId) {
-
-        long startTime = System.currentTimeMillis();
-
-        return CompletableFuture.supplyAsync(() -> {
+    public OrderResponse placeOrder(OrderRequest orderRequest, String userId) {
 
             if(!ordersEnabled){
                 log.warn("Pedido rechazado: Servicio desabilidado por configuracion");
@@ -88,17 +82,11 @@ public class OrderServiceImpl implements OrderService{
             order.setOrderNumber(UUID.randomUUID().toString());
             order.setUserId(userId);
 
-            long totalTime = System.currentTimeMillis() - startTime;
-
-            if(totalTime > 3000){
-                log.warn("⏳ Timeout detectado internamente ({} ms). Abortando guardado en DB.", totalTime);
-                throw new RuntimeException("Timeout excedido - Rollback manaul");
-            }
 
             Order savedOrder = orderRepository.save(order);
             log.info("Order guradada con exito. ID: {}", savedOrder.getId());
+
             return orderMapper.toOrderResponse(savedOrder);
-        });
 
     }
 
