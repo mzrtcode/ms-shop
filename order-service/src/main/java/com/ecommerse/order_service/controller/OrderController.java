@@ -23,7 +23,7 @@ public class    OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    CompletableFuture<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest orderRequest, @AuthenticationPrincipal Jwt jwt) {
+    OrderResponse placeOrder(@Valid @RequestBody OrderRequest orderRequest, @AuthenticationPrincipal Jwt jwt) {
         return orderService.placeOrder(orderRequest, jwt.getSubject());
     }
 
